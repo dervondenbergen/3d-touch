@@ -1,9 +1,10 @@
-var element = document.getElementById('forceMe');
-var forceValueOutput = document.getElementById('forceValue');
-var background = document.getElementById('background');
-var touch = null;
+var canvas = document.querySelector('canvas');
+canvas.height = window.innerHeight;
+canvas.width = window.innerWidth;
 
-addForceTouchToElement(element);
+var ctx = canvas.getContext('2d');
+
+addForceTouchToElement(canvas);
 
 function onTouchStart(e) {
   e.preventDefault();
@@ -21,9 +22,11 @@ function onTouchEnd(e) {
 }
 
 function checkForce(e) {
+  console.log(e);
   touch = e.touches[0];
   setTimeout(refreshForceValue.bind(touch), 10);
 }
+
 
 function refreshForceValue() {
   var touchEvent = this;
@@ -35,13 +38,23 @@ function refreshForceValue() {
     forceValue = 0;
   }
 
-  renderElement(forceValue);
+  var value = forceValue * 100;
+  var x = touchEvent.pageX;
+  var y = touchEvent.pageY;
+
+  renderElement(value, x, y);
 }
 
-function renderElement(forceValue) {
-  element.style.webkitTransform = 'translateX(-50%) translateY(-50%) scale(' + (1 + forceValue * 1.5) + ')';
-  background.style.webkitFilter = 'blur(' + forceValue * 30 + 'px)';
-  forceValueOutput.innerHTML = 'Force: ' + forceValue.toFixed(4);
+function renderElement(value, x, y) {
+
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  ctx.beginPath();
+  ctx.arc(x, y, value, 0, Math.PI*2, true);
+  ctx.closePath();
+
+  ctx.stroke();
+
 }
 
 function addForceTouchToElement(elem) {
